@@ -1,49 +1,44 @@
-import React from "react";
+import React, {useState} from "react";
 import ReactDOM from "react-dom";
 import Header from './components/Header';
 import Swagger from 'swagger-client';
 
 
-class HelloMessage extends React.Component {
-
-    state = {
-        foo: "bar"
-    };
-
-    testSwag = () => {
-        Swagger({ url: "http://petstore.swagger.io/v2/swagger.json" })
-            .then((client) => {
-                client
-                    .apis
-                    .pet // tag name == `pet`
-                    .addPet({ // operationId == `addPet`
-                        id: 1,
-                        body: {
-                            name: "bobby",
-                            status: "available"
-                        }
-                    })
-                    .then((a,b,c) => {
-                        debugger;
-
-                    })
-            })
-    };
-
-    render() {
-        return <div>
-            <Header/>
-            <div className="container">
-                <h1>Hello {this.props.name}</h1>
-            </div>
-            <button onClick={this.testSwag}>swag!</button>
-            <pre>
-                {JSON.stringify(this.state, undefined, 2)}
-            </pre>
-        </div>
-    }
+function testSwagger (setState) {
+    Swagger({ url: "http://petstore.swagger.io/v2/swagger.json" })
+        .then((client) => {
+            client
+                .apis
+                .pet // tag name == `pet`
+                .addPet({ // operationId == `addPet`
+                    id: 1,
+                    body: {
+                        name: "bobby",
+                        status: "available"
+                    }
+                })
+                .then((a,b,c) => {
+                    setState({foo: a.body})
+                })
+        })
 }
 
-let App = document.getElementById("app");
+function HelloWorld () {
+    const [state, setState] = useState({foo: "bar", count: 0});
+    return (
+        <div>
+            <h1>Test react working</h1>
+            <p>You clicked {state.count} times</p>
+            <button onClick={() => setState({...state, count: state.count + 1})}>
+                Click me
+            </button>
+            <h1>Real stuff</h1>
+            <button onClick={testSwagger.bind(undefined, setState)}>swag!</button>
+            <pre>
+                {JSON.stringify(state.foo, undefined, 2)}
+            </pre>
+        </div>
+    );
+}
 
-ReactDOM.render(<HelloMessage name="Yomi"/>, App);
+ReactDOM.render(<HelloWorld/>, document.getElementById("app"));
