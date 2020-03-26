@@ -2,7 +2,10 @@ import React, {useEffect, useState} from "react";
 import ReactDOM from "react-dom";
 import Swagger from 'swagger-client';
 
-const SERVICE_URL = "http://localhost:3000/api-docs"; // "http://petstore.swagger.io/v2/swagger.json"
+
+// http://petstore.swagger.io/v2/swagger.json
+// http://localhost:3000/api-docs
+const SERVICE_URL = "//localhost:3000/spec/openapi.yaml";
 
 //Swagger.http.withCredentials = true; // Access to fetch at 'http://localhost:8080/api-docs' from origin 'http://localhost:1234' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
 
@@ -44,8 +47,8 @@ function HelloWorld ({client}) {
         <div>
             <h1>Hello world</h1>
             <button onClick={() => setState({...state, count: (state.count || 0) + 1})}>Inc!</button>
-            <button onClick={testSwagger.bind(undefined, client, cursor)}>Bobby!</button>
-            <button onClick={fetchInventory.bind(undefined, client, cursor)}>Inventory!</button>
+            <button onClick={testSwagger.bind(undefined, client, cursor)} disabled={!client}>Bobby!</button>
+            <button onClick={fetchInventory.bind(undefined, client, cursor)} disabled={!client}>Inventory!</button>
             <pre>
                 {JSON.stringify(state, undefined, 2)}
             </pre>
@@ -54,25 +57,28 @@ function HelloWorld ({client}) {
 }
 
 function Init () {
-    const [state, setState] = useState({ client: null, error: null });
+    var [state, setState] = useState({ "swagger/client_spec_url": null, "swagger/error": null});
     useEffect(() => {
         (async () => {
             try {
                 var client = Swagger({ url: SERVICE_URL}); // fire immediately before delay
-                await a_sleep(1500); // So we can see the loading state
-                setState({...state, client: await client});
+                await a_sleep(1500); // Slow down the loading state
+                var client = await client;
+                setState({...state, "swagger/client_spec_url": client.url, "swagger/client": client});
             }
             catch (err) {
-                setState({...state, error: error2data(err)});
+                setState({...state, "swagger/error": error2data(err)});
             }
         })();
     }, []);
+
+    var {"swagger/client": client, ...state} = state; // omit client from debug view
 
     return (
         <div>
             <h1>Swagger Client</h1>
             <pre>{JSON.stringify(state, undefined, 2)}</pre>
-            {state.client !== null ? <HelloWorld client={state.client}/>
+            {state.client !== null ? <HelloWorld client={client}/>
                 : state.error !== null ? <h1>Error loading swagger client</h1>
                     : <h1>Loading swagger client</h1>}
         </div>
