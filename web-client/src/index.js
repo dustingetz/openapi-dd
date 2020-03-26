@@ -8,6 +8,8 @@ const SERVICE_URL = "http://localhost:3000/api-docs"; // "http://petstore.swagge
 
 let error2data = (e) => ({ name: e.name, message: e.message });
 
+let a_sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 async function testSwagger(client, [state, setState]) {
     // tag name == `pet`; operationId == `addPet`
     try {
@@ -56,7 +58,9 @@ function Init () {
     useEffect(() => {
         (async () => {
             try {
-                setState({...state, client: await Swagger({ url: SERVICE_URL})});
+                var client = Swagger({ url: SERVICE_URL}); // fire immediately before delay
+                await a_sleep(1500); // So we can see the loading state
+                setState({...state, client: await client});
             }
             catch (err) {
                 setState({...state, error: error2data(err)});
