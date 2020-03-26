@@ -16,6 +16,7 @@ const ExpressServer = require('./expressServer');
 //   });
 const launchServer = async () => {
   try {
+    logger.info(`process.env.NODE_ENV: ${process.env.NODE_ENV}`);
     this.expressServer = new ExpressServer(config.URL_PORT, config.OPENAPI_YAML);
     await this.expressServer.launch();
     logger.info('Express server running');
