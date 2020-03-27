@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import ReactDOM from "react-dom";
 import Swagger from 'swagger-client';
+import {mergeState, doSwagger, a_sleep, error_data} from "./etc/swaggerUtil"
 
 
 // http://petstore.swagger.io/v2/swagger.json
@@ -9,55 +10,36 @@ const SERVICE_URL = "//localhost:3000/spec/openapi.yaml";
 
 //Swagger.http.withCredentials = true; // Access to fetch at 'http://localhost:8080/api-docs' from origin 'http://localhost:1234' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
 
-let error2data = (e) => ({ name: e.name, message: e.message });
+let ioFetchInventory = async (client, cursor) => {
+    let result = await doSwagger(() => client.apis.store.getInventory());
+    mergeState(cursor, "inventory/result", result);
+};
 
-let a_sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-async function testSwagger(client, [state, setState]) {
-    // tag name == `pet`; operationId == `addPet`
-    try {
-        const x = await client.apis.pet.addPet({
-            id: 1,
-            body: {
-                name: "bobby",
-                status: "available"
-            }
-        });
-        setState({...state, response: x.body});
-    }
-    catch (e) {
-        setState({...state, error: error2data(e)});
-    }
-}
-
-async function fetchInventory (client, [state, setState]) {
-    try {
-        const response = await client.apis.store.getInventory();
-        setState({...state, response: response.body});
-    }
-    catch (e) {
-        setState({...state, error: error2data(e)});
-    }
-}
+let ioAddPet = async (client, cursor) => {
+    let result = await doSwagger(() => {
+        let directive = { id: 1, body: { name: "bobby", status: "available" }};
+        // tag name == `pet`; operationId == `addPet`
+        return client.apis.pet.addPet(directive);
+    });
+    mergeState(cursor, "addPet/result", result);
+};
 
 function HelloWorld ({client}) {
-    const cursor = useState({response: {}, count: 0});
+    const cursor = useState({"hello-world/count": 0});
     const [state, setState] = cursor;
     return (
         <div>
             <h1>Hello world</h1>
-            <button onClick={() => setState({...state, count: (state.count || 0) + 1})}>Inc!</button>
-            <button onClick={testSwagger.bind(undefined, client, cursor)} disabled={!client}>Bobby!</button>
-            <button onClick={fetchInventory.bind(undefined, client, cursor)} disabled={!client}>Inventory!</button>
-            <pre>
-                {JSON.stringify(state, undefined, 2)}
-            </pre>
+            <button onClick={() => setState({...state, "hello-world/count": state["hello-world/count"] + 1})}>Inc!</button>
+            <button onClick={() => ioAddPet(client, cursor)} disabled={!client}>AddPet!</button>
+            <button onClick={() => ioFetchInventory(client, cursor)} disabled={!client}>Inventory!</button>
+            <pre>{JSON.stringify(state, undefined, 2)}</pre>
         </div>
     );
 }
 
 function Init () {
-    var [state, setState] = useState({ "swagger/client_spec_url": null, "swagger/error": null});
+    var [state, setState] = useState({ "swagger/client_spec_url": null, "swagger/error_client_init": null});
     useEffect(() => {
         (async () => {
             try {
@@ -67,7 +49,7 @@ function Init () {
                 setState({...state, "swagger/client_spec_url": client.url, "swagger/client": client});
             }
             catch (err) {
-                setState({...state, "swagger/error": error2data(err)});
+                setState({...state, "swagger/error_client_init": error_data(err)});
             }
         })();
     }, []);
