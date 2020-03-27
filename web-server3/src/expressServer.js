@@ -7,7 +7,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const { OpenApiValidator } = require('express-openapi-validator');
-const openapiRouter = require('./utils/openapiRouter');
+const openapiRouter = require('./openapiRouter');
 const logger = require('./logger');
 
 class ExpressServer {
