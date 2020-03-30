@@ -18,9 +18,17 @@ export let a_sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 export let do_result = async (async_f) => {
     var left, right;
     try {
-        right = await async_f();
+        right = async_f();
+        try {
+            right = await right;
+        }
+        catch (e) {
+            // Promise rejection
+            left = e;
+        }
     }
     catch (e) {
+        // Runtime exception
         left = e;
     }
     return [left, right];
