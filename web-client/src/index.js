@@ -9,8 +9,6 @@ import {a_sleep, doSwagger, error_data, mergeState, hashStr} from "./etc"
 const SERVICE_URL = "http://petstore.swagger.io/v2/swagger.json";
 //const SERVICE_URL = "//localhost:3000/spec/openapi.yaml";
 
-//Swagger.http.withCredentials = true; // Access to fetch at 'http://localhost:8080/api-docs' from origin 'http://localhost:1234' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
-
 let ioFetchInventory = async (client, cursor) => {
     let result = await doSwagger(() => client.apis.store.getInventory());
     mergeState(cursor, "inventory/result", result);
@@ -31,13 +29,11 @@ let renderTable = (records) =>
         <tr>{Object.entries(records[0]).map(([k,v]) => <th>{k.substring(0, 20)}</th>)}</tr>
         </thead>
         <tbody>
-        {records.map(record => <tr key={hashStr(record.toString())}>
-            {
-                Object.entries(record).map(([k, v]) => {
-                    return <td>{v}</td>;
-                })
-            }
-        </tr>)}
+        {records.map(record =>
+            <tr key={hashStr(record.toString())}>
+                {Object.entries(record).map(([k, v]) =>
+                    <td>{v}</td>)}
+            </tr>)}
         </tbody>
     </Table>;
 
@@ -51,7 +47,7 @@ function HelloWorld ({client}) {
             <h1>Hello world</h1>
             <button onClick={() => setState({...state, "hello-world/count": state["hello-world/count"] + 1})}>Inc!
             </button>
-            <button onClick={() => ioAddPet(client, cursor)} disabled={!client}>AddPet!</button>
+            {/*<button onClick={() => ioAddPet(client, cursor)} disabled={!client}>AddPet!</button>*/}
             <button onClick={() => ioFetchInventory(client, cursor)} disabled={!client}>Inventory!</button>
             {/*{renderTable([{name: "Alice"}, {name: "Becky"}, {name: "Charles"}])}*/}
             {state["inventory/result"] ? renderForm(state["inventory/result"]["result/success"]) : null}

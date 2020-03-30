@@ -35,7 +35,7 @@ class StoreService {
     return new Promise(
       async (resolve) => {
         try {
-          resolve(Service.successResponse(''));
+          resolve(Service.successResponse({"foo": [1,2,3]}));
         } catch (e) {
           resolve(Service.rejectResponse(
             e.message || 'Invalid input',

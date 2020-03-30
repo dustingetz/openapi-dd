@@ -34,3 +34,30 @@ npm start
 wget https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/4.2.3/openapi-generator-cli-4.2.3.jar -O openapi-generator-cli.jar
 java -jar openapi-generator-cli.jar generate -g nodejs-express-server -i http://petstore.swagger.io/v2/swagger.json -o web-server3
 ```
+
+
+## How it works
+
+```yaml
+/store/inventory:
+get:
+  description: Returns a map of status codes to quantities
+  operationId: getInventory
+  responses:
+    "200":
+      content:
+        application/json:
+          schema:
+            additionalProperties:
+              format: int32
+              type: integer
+            type: object
+      description: successful operation
+  security:
+  - api_key: []
+  summary: Returns pet inventories by status
+  tags:
+  - store
+  x-openapi-router-controller: StoreController
+  x-openapi-router-service: StoreService
+```
