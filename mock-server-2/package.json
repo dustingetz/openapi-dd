@@ -1,0 +1,9 @@
+{
+  "name": "mock-server-prism",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@stoplight/prism-cli": "^3.3.2"
+  }
+}

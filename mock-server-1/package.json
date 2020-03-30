@@ -1,0 +1,9 @@
+{
+  "name": "mock-server-1",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "open-api-mocker": "^1.2.5"
+  }
+}
